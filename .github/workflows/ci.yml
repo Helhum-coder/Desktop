@@ -3,8 +3,17 @@ name: CI - Build and Test
 on:
   push:
     branches: [ main, master, develop ]
+    branches-ignore:
+      - 'spark/**'
+      - 'copilot/**'
+      - 'ai/**'
+      - 'temp/**'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   pull_request:
     branches: [ main, master, develop ]
+    types: [ opened, synchronize, ready_for_review ]
   workflow_dispatch:
 
 permissions:
@@ -14,6 +23,12 @@ permissions:
 
 jobs:
   build:
+    # Skip if triggered by Spark/Copilot AI
+    if: |
+      !contains(github.event.head_commit.message, '[spark]') &&
+      !contains(github.event.head_commit.message, '[copilot]') &&
+      !contains(github.ref, 'spark/') &&
+      !contains(github.ref, 'copilot/')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     
